@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace ShoesV6
 {
-    public class iniHelperSSS
+    public class iniHelperBBB
     {
         public string path;
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
