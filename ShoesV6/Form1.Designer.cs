@@ -89,6 +89,7 @@
             this.label10 = new System.Windows.Forms.Label();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.tabControl2.SuspendLayout();
             this.Scan.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -116,6 +117,7 @@
             // Scan
             // 
             this.Scan.BackColor = System.Drawing.SystemColors.Control;
+            this.Scan.Controls.Add(this.button1);
             this.Scan.Controls.Add(this.btn_upload);
             this.Scan.Controls.Add(this.btn_IOConnect);
             this.Scan.Controls.Add(this.btn_TC);
@@ -481,6 +483,7 @@
             this.text_angle.Size = new System.Drawing.Size(100, 33);
             this.text_angle.TabIndex = 47;
             this.text_angle.Text = "0";
+            this.text_angle.KeyDown += new System.Windows.Forms.KeyEventHandler(this.text_KeyDown);
             // 
             // label5
             // 
@@ -510,6 +513,7 @@
             this.text_shiftY.Size = new System.Drawing.Size(100, 33);
             this.text_shiftY.TabIndex = 44;
             this.text_shiftY.Text = "0";
+            this.text_shiftY.KeyDown += new System.Windows.Forms.KeyEventHandler(this.text_KeyDown);
             // 
             // label7
             // 
@@ -529,6 +533,7 @@
             this.text_shiftHeight.Size = new System.Drawing.Size(100, 33);
             this.text_shiftHeight.TabIndex = 42;
             this.text_shiftHeight.Text = "0";
+            this.text_shiftHeight.KeyDown += new System.Windows.Forms.KeyEventHandler(this.text_KeyDown);
             // 
             // label6
             // 
@@ -548,6 +553,7 @@
             this.text_shiftX.Size = new System.Drawing.Size(100, 33);
             this.text_shiftX.TabIndex = 40;
             this.text_shiftX.Text = "0";
+            this.text_shiftX.KeyDown += new System.Windows.Forms.KeyEventHandler(this.text_KeyDown);
             // 
             // label4
             // 
@@ -567,6 +573,7 @@
             this.text_shrink.Size = new System.Drawing.Size(100, 33);
             this.text_shrink.TabIndex = 38;
             this.text_shrink.Text = "0";
+            this.text_shrink.KeyDown += new System.Windows.Forms.KeyEventHandler(this.text_KeyDown);
             // 
             // btn_SavePara
             // 
@@ -635,7 +642,7 @@
             this.text_Threshold.Size = new System.Drawing.Size(100, 33);
             this.text_Threshold.TabIndex = 26;
             this.text_Threshold.Text = "0";
-            this.text_Threshold.KeyDown += new System.Windows.Forms.KeyEventHandler(this.text_Threshold_KeyDown);
+            this.text_Threshold.KeyDown += new System.Windows.Forms.KeyEventHandler(this.text_KeyDown);
             // 
             // label_KUKA
             // 
@@ -791,6 +798,16 @@
             this.textBox1.Text = "0";
             this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(441, 346);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(93, 36);
+            this.button1.TabIndex = 37;
+            this.button1.Text = "aa";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
             this.ClientSize = new System.Drawing.Size(942, 502);
@@ -887,6 +904,7 @@
         private System.Windows.Forms.Button btn_removecamerarecipe;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button btn_upload;
+        private System.Windows.Forms.Button button1;
     }
 }
 

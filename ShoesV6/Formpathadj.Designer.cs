@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend6 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.textBox_X = new System.Windows.Forms.TextBox();
             this.textBox_Y = new System.Windows.Forms.TextBox();
@@ -57,6 +57,7 @@
             this.numericUpDown_index = new System.Windows.Forms.NumericUpDown();
             this.button_RobotMove = new System.Windows.Forms.Button();
             this.checkBox_Auto = new System.Windows.Forms.CheckBox();
+            this.btn_gun = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_X)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_Y)).BeginInit();
@@ -69,21 +70,21 @@
             // 
             // chart1
             // 
-            chartArea6.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea6);
-            legend6.Name = "Legend1";
-            this.chart1.Legends.Add(legend6);
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(12, 11);
             this.chart1.Name = "chart1";
-            series6.ChartArea = "ChartArea1";
-            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            series6.Legend = "Legend1";
-            series6.MarkerColor = System.Drawing.Color.Gray;
-            series6.MarkerSize = 7;
-            series6.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
-            series6.Name = "Series1";
-            series6.YValuesPerPoint = 2;
-            this.chart1.Series.Add(series6);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series1.Legend = "Legend1";
+            series1.MarkerColor = System.Drawing.Color.Gray;
+            series1.MarkerSize = 7;
+            series1.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
+            series1.Name = "Series1";
+            series1.YValuesPerPoint = 2;
+            this.chart1.Series.Add(series1);
             this.chart1.Size = new System.Drawing.Size(581, 458);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chart1";
@@ -432,11 +433,23 @@
             this.checkBox_Auto.UseVisualStyleBackColor = true;
             this.checkBox_Auto.CheckedChanged += new System.EventHandler(this.checkBox_Auto_CheckedChanged);
             // 
+            // btn_gun
+            // 
+            this.btn_gun.Font = new System.Drawing.Font("微軟正黑體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.btn_gun.Location = new System.Drawing.Point(840, 380);
+            this.btn_gun.Name = "btn_gun";
+            this.btn_gun.Size = new System.Drawing.Size(93, 36);
+            this.btn_gun.TabIndex = 38;
+            this.btn_gun.Text = "Gun";
+            this.btn_gun.UseVisualStyleBackColor = true;
+            this.btn_gun.Click += new System.EventHandler(this.btn_gun_Click);
+            // 
             // Formpathadj
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 11F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(945, 504);
+            this.Controls.Add(this.btn_gun);
             this.Controls.Add(this.checkBox_Auto);
             this.Controls.Add(this.button_RobotMove);
             this.Controls.Add(this.numericUpDown_index);
@@ -508,5 +521,6 @@
         private System.Windows.Forms.NumericUpDown numericUpDown_index;
         private System.Windows.Forms.Button button_RobotMove;
         private System.Windows.Forms.CheckBox checkBox_Auto;
+        private System.Windows.Forms.Button btn_gun;
     }
 }

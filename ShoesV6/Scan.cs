@@ -410,7 +410,7 @@ namespace ShoesV6
                 }
                 max = 0;
 
-                for (int j = line_mid[i]; j <= BoundingRectangle.Right; j++)
+                for (int j = line_mid[i]; j <= BoundingRectangle.Right - 1; j++) 
                 {
                     if (newHeight[lineAt[i]][j] > max)//找到右邊最高點
                     {
@@ -419,125 +419,127 @@ namespace ShoesV6
                         maxpointR.Y = lineAt[i];
                     }
                 }
-                for (int s = maxpointR.X + 3; s <= BoundingRectangle.Right; s++)
+                for (int s = maxpointR.X + 3; s <= BoundingRectangle.Right - 1; s++) 
                 {
                     newHeight[lineAt[i]][s] = 0;
                 }
-
-                for (int s = maxpointL.X; s < line_mid[i]; s++)//找尋左邊最低點與最高點
+                if (newHeight[lineAt[i]].Count(s => s != 0) > 30)
                 {
-
-                    if (newHeight[lineAt[i]][s + 1] != 0)
+                    for (int s = maxpointL.X; s < line_mid[i]; s++)//找尋左邊最低點與最高點
                     {
 
-                        if (Math.Abs(newHeight[lineAt[i]][s] - newHeight[lineAt[i]][s + 1]) < 0.01)
+                        if (newHeight[lineAt[i]][s + 1] != 0)
                         {
-                            counter += 1;
-                        }
-                        else
-                        {
-                            counter = 0;
-                        }
-                        if (counter == 5)
-                        {
-                            minpointL.X = s - 4;
-                            minpointL.Y = lineAt[i];
-                            minvalue = newHeight[maxpointL.Y][maxpointL.X] - newHeight[minpointL.Y][minpointL.X];
 
-                            if (minvalue > 4 && minvalue < 40)
+                            if (Math.Abs(newHeight[lineAt[i]][s] - newHeight[lineAt[i]][s + 1]) < 0.01)
                             {
-                                pointMinHeight.X = minpointL.X;
-                                pointMinHeight.Y = minpointL.Y;
-                                pointMinHeight.Z = newHeight[minpointL.Y][minpointL.X];
-                                //if (pointMinHeight.Z <= 45)
-                                //{
-                                checkPosition1 = minpointL.X - line_mid[i];
-                                MinpointHeightL.Add(pointMinHeight);
-                                leftfind = true;
-                                //}
+                                counter += 1;
+                            }
+                            else
+                            {
+                                counter = 0;
+                            }
+                            if (counter == 5)
+                            {
+                                minpointL.X = s - 4;
+                                minpointL.Y = lineAt[i];
+                                minvalue = newHeight[maxpointL.Y][maxpointL.X] - newHeight[minpointL.Y][minpointL.X];
 
-                                widthL.Add(minvalue);
-                                pointMaxHeight.X = maxpointL.X;
-                                pointMaxHeight.Y = maxpointL.Y;
-                                pointMaxHeight.Z = minvalue;
-                                break;
+                                if (/*minvalue > 4 &&*/ minvalue < 40)
+                                {
+                                    pointMinHeight.X = minpointL.X;
+                                    pointMinHeight.Y = minpointL.Y;
+                                    pointMinHeight.Z = newHeight[minpointL.Y][minpointL.X];
+                                    //if (pointMinHeight.Z <= 45)
+                                    //{
+                                    checkPosition1 = minpointL.X - line_mid[i];
+                                    MinpointHeightL.Add(pointMinHeight);
+                                    leftfind = true;
+                                    //}
+
+                                    widthL.Add(minvalue);
+                                    pointMaxHeight.X = maxpointL.X;
+                                    pointMaxHeight.Y = maxpointL.Y;
+                                    pointMaxHeight.Z = minvalue;
+                                    break;
+                                }
                             }
                         }
                     }
-                }
-                for (int s = maxpointR.X; s > line_mid[i]; s--)//找尋右邊最低點與最高點
-                {
-                    if (newHeight[lineAt[i]][s - 1] != 0)
+                    for (int s = maxpointR.X; s > line_mid[i]; s--)//找尋右邊最低點與最高點
                     {
-                        if (Math.Abs(newHeight[lineAt[i]][s] - newHeight[lineAt[i]][s - 1]) < 0.01)
+                        if (newHeight[lineAt[i]][s - 1] != 0)
                         {
-                            counter += 1;
-                        }
-                        else
-                            counter = 0;
-                        if (counter == 5)
-                        {
-                            minpointR.X = s + 4;
-                            minpointR.Y = lineAt[i];
-                            minvalue = newHeight[maxpointR.Y][maxpointR.X] - newHeight[minpointR.Y][minpointR.X];
-
-
-
-                            if (minvalue > 4 && minvalue < 40)
+                            if (Math.Abs(newHeight[lineAt[i]][s] - newHeight[lineAt[i]][s - 1]) < 0.01)
                             {
-                                pointMinHeight.X = minpointR.X;
-                                pointMinHeight.Y = minpointR.Y;
-                                pointMinHeight.Z = newHeight[minpointR.Y][minpointR.X];
-                                //if (pointMinHeight.Z <= 45)
-                                //{
-                                checkPosition2 = minpointR.X - line_mid[i];
-                                MinpointHeightR.Add(pointMinHeight);
-                                rightfind = true;
-                                //}
+                                counter += 1;
+                            }
+                            else
+                                counter = 0;
+                            if (counter == 5)
+                            {
+                                minpointR.X = s + 4;
+                                minpointR.Y = lineAt[i];
+                                minvalue = newHeight[maxpointR.Y][maxpointR.X] - newHeight[minpointR.Y][minpointR.X];
 
-                                widthR.Add(minvalue);
-                                pointMaxHeight.X = maxpointR.X;
-                                pointMaxHeight.Y = maxpointR.Y;
-                                pointMaxHeight.Z = minvalue;
-                                break;
+
+
+                                if (/*minvalue > 4 &&*/ minvalue < 40)
+                                {
+                                    pointMinHeight.X = minpointR.X;
+                                    pointMinHeight.Y = minpointR.Y;
+                                    pointMinHeight.Z = newHeight[minpointR.Y][minpointR.X];
+                                    //if (pointMinHeight.Z <= 45)
+                                    //{
+                                    checkPosition2 = minpointR.X - line_mid[i];
+                                    MinpointHeightR.Add(pointMinHeight);
+                                    rightfind = true;
+                                    //}
+
+                                    widthR.Add(minvalue);
+                                    pointMaxHeight.X = maxpointR.X;
+                                    pointMaxHeight.Y = maxpointR.Y;
+                                    pointMaxHeight.Z = minvalue;
+                                    break;
+                                }
                             }
                         }
                     }
-                }
 
-                if (Math.Abs(checkPosition2 + checkPosition1) > 35 && leftfind && rightfind)
-                {
-                    if (-checkPosition1 > checkPosition2)
+                    if (Math.Abs(checkPosition2 + checkPosition1) > 35 && leftfind && rightfind)
                     {
-                        leftfind = false;
-                        MinpointHeightL.RemoveAt(MinpointHeightL.Count() - 1);
-                        widthL.RemoveAt(widthL.Count() - 1);
+                        if (-checkPosition1 > checkPosition2)
+                        {
+                            leftfind = false;
+                            MinpointHeightL.RemoveAt(MinpointHeightL.Count() - 1);
+                            widthL.RemoveAt(widthL.Count() - 1);
+                        }
+                        else
+                        {
+                            rightfind = false;
+                            MinpointHeightR.RemoveAt(MinpointHeightR.Count() - 1);
+                            widthR.RemoveAt(widthR.Count() - 1);
+                        }
                     }
-                    else
+                    if (leftfind && !rightfind)
                     {
-                        rightfind = false;
-                        MinpointHeightR.RemoveAt(MinpointHeightR.Count() - 1);
-                        widthR.RemoveAt(widthR.Count() - 1);
+                        pointMinHeight.X = line_mid[i] + (line_mid[i] - minpointL.X);
+                        pointMinHeight.Y = minpointL.Y;
+                        pointMinHeight.Z = newHeight[minpointL.Y][minpointL.X];
+                        MinpointHeightR.Add(pointMinHeight);
+
+                        widthR.Add(minvalue);
+
                     }
-                }
-                if (leftfind && !rightfind)
-                {
-                    pointMinHeight.X = line_mid[i] + (line_mid[i] - minpointL.X);
-                    pointMinHeight.Y = minpointL.Y;
-                    pointMinHeight.Z = newHeight[minpointL.Y][minpointL.X];
-                    MinpointHeightR.Add(pointMinHeight);
+                    else if (rightfind && !leftfind)
+                    {
+                        pointMinHeight.X = line_mid[i] - (minpointR.X - line_mid[i]);
+                        pointMinHeight.Y = minpointR.Y;
+                        pointMinHeight.Z = newHeight[minpointR.Y][minpointR.X];
+                        MinpointHeightL.Add(pointMinHeight);
 
-                    widthR.Add(minvalue);
-
-                }
-                else if (rightfind && !leftfind)
-                {
-                    pointMinHeight.X = line_mid[i] - (minpointR.X - line_mid[i]);
-                    pointMinHeight.Y = minpointR.Y;
-                    pointMinHeight.Z = newHeight[minpointR.Y][minpointR.X];
-                    MinpointHeightL.Add(pointMinHeight);
-
-                    widthL.Add(minvalue);
+                        widthL.Add(minvalue);
+                    }
                 }
             }
             double M = (double)(-TopPoint.Y + MidPoint.Y) / (TopPoint.X - MidPoint.X);
@@ -552,6 +554,65 @@ namespace ShoesV6
                 Console.WriteLine("Right");
                 dir = "Right";
             }
+
+            #region 中值濾波
+            int calPosition, ArrayIndex, order;
+            List<Point3D> _MinpointHeightL = new List<Point3D>();
+            List<Point3D> _MinpointHeightR = new List<Point3D>();
+            List<double> _widthL = new List<double>();
+            List<double> _widthR = new List<double>();
+            order = 7;//取幾個點進行濾波
+            double[] data = new double[order];
+            for (int CurrentPosition = 0; CurrentPosition < MinpointHeightL.Count(); CurrentPosition++)
+            {
+                ArrayIndex = 0;
+                Array.Clear(data, 0, data.Length);
+                calPosition = CurrentPosition;
+                if (CurrentPosition <= order / 2)
+                    calPosition = order / 2;
+                if (CurrentPosition >= MinpointHeightL.Count - (order / 2 + 1))
+                    calPosition = MinpointHeightL.Count() - (order / 2 + 1);
+                for (int j = calPosition - order / 2; j <= calPosition + order / 2; j++)
+                {
+                    data[ArrayIndex++] = MinpointHeightL[j].Z;
+                }
+                data = data.OrderBy(c => c).ToArray();
+                if (Math.Abs(MinpointHeightL[CurrentPosition].Z - data[2]) < 7)
+                {
+                    _MinpointHeightL.Add(MinpointHeightL[CurrentPosition]);
+                    _widthL.Add(widthL[CurrentPosition]);
+                }
+            }
+            for (int CurrentPosition = 0; CurrentPosition < MinpointHeightR.Count(); CurrentPosition++)
+            {
+                ArrayIndex = 0;
+                Array.Clear(data, 0, data.Length);
+                calPosition = CurrentPosition;
+                if (CurrentPosition <= order / 2)
+                    calPosition = order / 2;
+                if (CurrentPosition >= MinpointHeightR.Count - (order / 2 + 1))
+                    calPosition = MinpointHeightR.Count() - (order / 2 + 1);
+                for (int j = calPosition - order / 2; j <= calPosition + order / 2; j++)
+                {
+                    data[ArrayIndex++] = MinpointHeightR[j].Z;
+                }
+                data = data.OrderBy(c => c).ToArray();
+                if (Math.Abs(MinpointHeightR[CurrentPosition].Z - data[2]) < 7)
+                {
+                    _MinpointHeightR.Add(MinpointHeightR[CurrentPosition]);
+                    _widthR.Add(widthR[CurrentPosition]);
+                }
+            }
+            MinpointHeightR.Clear();
+            MinpointHeightL.Clear();
+            widthR.Clear();
+            widthL.Clear();
+            MinpointHeightR.AddRange(_MinpointHeightR);
+            MinpointHeightL.AddRange(_MinpointHeightL);
+            widthR.AddRange(_widthR);
+            widthL.AddRange(_widthL);
+            #endregion
+
             MinpointHeightL = MinpointHeightL.OrderBy(p => p.Y).ToList();
             MinpointHeightR = MinpointHeightR.OrderBy(p => p.Y).ToList();
             sw2.Stop();

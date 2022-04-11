@@ -10,6 +10,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace ShoesV6
 {
@@ -37,34 +38,22 @@ namespace ShoesV6
             Thread_Ads.IsBackground = true;
             Thread_sample = new Thread(scan);
             Thread_sample.IsBackground = true;
+            Thread_test = new Thread(scantest);
+            Thread_test.IsBackground = true;
             DeviceConnect();
             CheckFileExist();
-            string[] a = ini.SectionNames("combobox.ini");
-            if (a != null)
-            {
-                for (int i = 0; i < a.Count(); i++)
-                {
-                    string N = ini.IniReadValue(a[i], "Name", "combobox.ini");
-                    comboBox_model.Items.Add(N);
-                    comboBox_ModelSize.Items.Add(N);
-                }
-            }
-            a = ini.SectionNames("combobox_cam.ini");
-            if (a != null)
-            {
-                for (int i = 0; i < a.Count(); i++)
-                {
-                    string N = ini.IniReadValue(a[i], "Name", "combobox_cam.ini");
-                    comboBox_Cameramodel.Items.Add(N);
-                }
-            }
+            refresh_comboBox_Cameramodel();
+            refresh_comboBox_ModelSize();
             ShareArea.txtLog.WriteLog(1, "程式初始化成功");
         }
         Thread Thread_updateUI, Thread_scan, Thread_Robot, Thread_Sendpath, Thread_CamConnect, Thread_Ads, Thread_DeviceConnect, Thread_sample;
+        Thread Thread_test;
         iniHelper ini = new iniHelper();
         InstantDiCtrl DiCtrl = new InstantDiCtrl();
+        Stopwatch sw_sensor1 = new Stopwatch();
+        Stopwatch sw_sensor2 = new Stopwatch();
         uint hConnect = new uint();
-        uint heartbeat, heartbeatHandle;
+        uint heartbeat, heartbeatHandle, RobotEGunNoUse;
         double ShoeSize;
         public delegate void IOChange(bool state);
         public event IOChange IOchange;
@@ -81,7 +70,34 @@ namespace ShoesV6
                 _IOstate = value;
             }
         }
-
+        private void refresh_comboBox_Cameramodel()
+        {
+            comboBox_Cameramodel.Items.Clear();
+            string[] a = ini.SectionNames("combobox.ini");
+            a = ini.SectionNames("combobox_cam.ini");
+            if (a != null)
+            {
+                for (int i = 0; i < a.Count(); i++)
+                {
+                    string N = ini.IniReadValue(a[i], "Name", "combobox_cam.ini");
+                    comboBox_Cameramodel.Items.Add(N);
+                }
+            }
+        }
+        private void refresh_comboBox_ModelSize()
+        {
+            comboBox_ModelSize.Items.Clear();
+            string[] a = ini.SectionNames("combobox.ini");
+            if (a != null)
+            {
+                for (int i = 0; i < a.Count(); i++)
+                {
+                    string N = ini.IniReadValue(a[i], "Name", "combobox.ini");
+                    comboBox_model.Items.Add(N);
+                    comboBox_ModelSize.Items.Add(N);
+                }
+            }
+        }
         private void btn_CamConnect_Click(object sender, EventArgs e)
         {
             if (!Thread_CamConnect.IsAlive && !ShareArea.Connectstate[1])
@@ -221,7 +237,7 @@ namespace ShoesV6
             }
 
             ShareArea.txtLog.WriteLog(1, "載入" + comboBox_ModelSize.Text + "資料成功");
-            btn_Scan.Enabled = true;         
+            btn_Scan.Enabled = true;
         }
 
         private void btn_addSample_Click(object sender, EventArgs e)
@@ -243,7 +259,7 @@ namespace ShoesV6
                 comboBox_model.Items.Add(comboBox_model.Text);
                 ini.IniWriteValue(comboBox_model.Text, "Name", comboBox_model.Text, "combobox.ini");
             }
-            
+
             if (!File.Exists(startpath + @"\shiftdata\" + comboBox_model.Text + @"\" + comboBox_size.Text + comboBox_direction.Text + ".txt") && comboBox_size.Text != "" && comboBox_direction.Text != "")
             {
                 File.Create(startpath + @"\shiftdata\" + comboBox_model.Text + @"\" + comboBox_size.Text + comboBox_direction.Text + ".txt").Close();
@@ -291,6 +307,7 @@ namespace ShoesV6
             {
                 hConnect = ShareArea.AdsClient.AddDeviceNotificationEx("X400Global.X42A", new TwinCAT.Ads.NotificationSettings(TwinCAT.Ads.AdsTransMode.OnChange, 100, 0), null, typeof(bool));
                 ShoeSize = ShareArea.AdsClient.AddDeviceNotificationEx("OutsolePC.OutsoleSize", new TwinCAT.Ads.NotificationSettings(TwinCAT.Ads.AdsTransMode.OnChange, 100, 0), null, typeof(double));
+                RobotEGunNoUse = ShareArea.AdsClient.AddDeviceNotificationEx("RobotGlobal.RobotEGunNoUse", new TwinCAT.Ads.NotificationSettings(TwinCAT.Ads.AdsTransMode.OnChange, 100, 0), null, typeof(bool));
                 heartbeatHandle = ShareArea.AdsClient.CreateVariableHandle("OutsolePC.OutsolePCHeartBeat");
                 ShareArea.txtLog.WriteLog(1, "主控連線成功");
 
@@ -321,7 +338,7 @@ namespace ShoesV6
         private void btn_pathadj_Click(object sender, EventArgs e)
         {
             Formpathadj formpathadj = new Formpathadj();
-            if(formpathadj.Enabled)
+            if (formpathadj.Enabled)
                 formpathadj.ShowDialog();
             formpathadj.Close();
         }
@@ -337,7 +354,7 @@ namespace ShoesV6
         }
         private void btn_startsample_Click(object sender, EventArgs e)
         {
-            if(!File.Exists(startpath + @"\shiftdata\" + comboBox_model.Text + @"\" + comboBox_size.Text + comboBox_direction.Text + ".txt"))
+            if (!File.Exists(startpath + @"\shiftdata\" + comboBox_model.Text + @"\" + comboBox_size.Text + comboBox_direction.Text + ".txt"))
             {
                 MessageBox.Show("未建立模型");
                 return;
@@ -405,9 +422,16 @@ namespace ShoesV6
             {
                 btn_RobConnect_Click(null, null);
             }
-            if(e.Handle == ShoeSize)
+            if (e.Handle == ShoeSize)
             {
-                ShareArea.size = (double)e.Value;       
+                ShareArea.size = (double)e.Value;
+            }
+            if (e.Handle == RobotEGunNoUse && ShareArea.Connectstate[0] == true)
+            {
+                if ((bool)e.Value == true)
+                    ShareArea.KUKA_EKI.Send("<Robot><Gun>0</Gun></Robot>");
+                else
+                    ShareArea.KUKA_EKI.Send("<Robot><Gun>1</Gun></Robot>");
             }
         }
 
@@ -441,7 +465,7 @@ namespace ShoesV6
 
             }
         }
-       
+
 
         private void btn_TC_Click(object sender, EventArgs e)
         {
@@ -451,14 +475,20 @@ namespace ShoesV6
 
         private void instantDiCtrl1_Interrupt(object sender, Automation.BDaq.DiSnapEventArgs e)
         {
-            if (e.SrcNum == 0)
+            if (e.SrcNum == 0 && sw_sensor1.ElapsedMilliseconds == 0)
             {
                 ShareArea.input[0] = true;
+                sw_sensor1.Start();
             }
-            else if (e.SrcNum == 8)
+            else if (e.SrcNum == 8 && sw_sensor2.ElapsedMilliseconds == 0)
             {
                 ShareArea.input[1] = true;
+                sw_sensor2.Start();
             }
+            if (sw_sensor1.ElapsedMilliseconds > 5000)
+                sw_sensor1.Reset();
+            else if (sw_sensor2.ElapsedMilliseconds > 5000)
+                sw_sensor2.Reset();
         }
 
         #region UIevent
@@ -481,21 +511,7 @@ namespace ShoesV6
 
         private void text_Threshold_KeyDown(object sender, KeyEventArgs e)
         {
-            
-            if (e.KeyCode == Keys.Enter)
-            {
-                int para;
-                try
-                {
-                    para = int.Parse(text_Threshold.Text);
-                    ShareArea.Threshold = int.Parse(text_Threshold.Text);
-                }
-                catch
-                {
-                    MessageBox.Show("請輸入數字");
-                }
 
-            }
         }
 
         private void btn_savecamrecipe_Click(object sender, EventArgs e)
@@ -505,7 +521,7 @@ namespace ShoesV6
                 MessageBox.Show("請輸入型號");
                 return;
             }
-            else if (!File.Exists(startpath + @"\camerarecipe\" + comboBox_Cameramodel.Text + ".txt")) 
+            else if (!File.Exists(startpath + @"\camerarecipe\" + comboBox_Cameramodel.Text + ".txt"))
             {
                 File.Create(startpath + @"\camerarecipe\" + comboBox_Cameramodel.Text + ".txt").Close();
             }
@@ -523,7 +539,6 @@ namespace ShoesV6
                 MessageBox.Show("請輸入數字");
                 return;
             }
-            comboBox_Cameramodel.Items.Add(comboBox_Cameramodel.Text);
             ini.IniWriteValue(comboBox_Cameramodel.Text, "Name", comboBox_Cameramodel.Text, "combobox_cam.ini");
             using (System.IO.StreamWriter sr = new System.IO.StreamWriter(startpath + @"\camerarecipe\" + comboBox_Cameramodel.Text + ".txt", false))
             {
@@ -531,7 +546,7 @@ namespace ShoesV6
                     text_shiftHeight.Text + "," + text_angle.Text + ",";
                 sr.WriteLine(para);
             }
-
+            refresh_comboBox_Cameramodel();
         }
 
         private void comboBox_Cameramodel_SelectedIndexChanged(object sender, EventArgs e)
@@ -562,7 +577,7 @@ namespace ShoesV6
                 ShareArea.txtLog.WriteLog(1, "載入" + comboBox_Cameramodel.Text + "相機參數成功");
                 btn_Scan.Enabled = true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
@@ -570,7 +585,7 @@ namespace ShoesV6
 
         private void btn_removecamerarecipe_Click(object sender, EventArgs e)
         {
-            if (comboBox_Cameramodel.Text != "" )
+            if (comboBox_Cameramodel.Text != "")
             {
                 if (File.Exists(startpath + @"\camerarecipe\" + comboBox_Cameramodel.Text + ".txt"))
                     File.Delete(startpath + @"\camerarecipe\" + comboBox_Cameramodel.Text + ".txt");
@@ -587,7 +602,7 @@ namespace ShoesV6
                 int para;
                 try
                 {
-                    para = int.Parse(textBox1.Text);                         
+                    para = int.Parse(textBox1.Text);
                     ShareArea.shiftX = para;
                 }
                 catch
@@ -657,7 +672,7 @@ namespace ShoesV6
             GC.Collect();
         }
 
-        private bool CheckFTPFileExist(string path,string remotepath)
+        private bool CheckFTPFileExist(string path, string remotepath)
         {
             FtpWebRequest request;
             StreamReader reader;
@@ -761,24 +776,113 @@ namespace ShoesV6
             Console.WriteLine(sw2.ElapsedMilliseconds);
 
         }
+
+        private void text_KeyDown(object sender, KeyEventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            if (e.KeyCode == Keys.Enter)
+            {
+                int para;
+                switch (textBox.Name)
+                {
+                    case "text_Threshold":
+                        try
+                        {
+                            para = int.Parse(text_Threshold.Text);
+                            ShareArea.Threshold = para;
+                        }
+                        catch
+                        {
+                            MessageBox.Show("請輸入數字");
+                        }
+                        break;
+                    case "text_shrink":
+                        try
+                        {
+                            para = int.Parse(text_shrink.Text);
+                            ShareArea.shrink = para;
+                        }
+                        catch
+                        {
+                            MessageBox.Show("請輸入數字");
+                        }
+                        break;
+                    case "text_shiftX":
+                        try
+                        {
+                            para = int.Parse(text_shiftX.Text);
+                            ShareArea.shiftX = para;
+                        }
+                        catch
+                        {
+                            MessageBox.Show("請輸入數字");
+                        }
+                        break;
+                    case "text_shiftY":
+                        try
+                        {
+                            para = int.Parse(text_shiftY.Text);
+                            ShareArea.shiftY = para;
+                        }
+                        catch
+                        {
+                            MessageBox.Show("請輸入數字");
+                        }
+                        break;
+                    case "text_shiftHeight":
+                        try
+                        {
+                            para = int.Parse(text_shiftHeight.Text);
+                            ShareArea.shiftHeight = para;
+                        }
+                        catch
+                        {
+                            MessageBox.Show("請輸入數字");
+                        }
+                        break;
+                    case "text_angle":
+                        try
+                        {
+                            para = int.Parse(text_angle.Text);
+                            ShareArea.angle = para;
+                        }
+                        catch
+                        {
+                            MessageBox.Show("請輸入數字");
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (!Thread_test.IsAlive)
+            {
+                Thread_test.Start();
+            }
+        }
+
         private void UpLoadMovePath(string filename)
         {
             FtpWebRequest request;
             byte[] fileContents;
-            request = (FtpWebRequest)WebRequest.Create("ftp://192.168.10.100/"+ DateTime.Now.ToString("yyyy-MM-dd")+"/Bottom/"+filename);
+            request = (FtpWebRequest)WebRequest.Create("ftp://192.168.10.100/" + DateTime.Now.ToString("yyyy-MM-dd") + "/Bottom/" + filename);
             request.Credentials = new NetworkCredential("beckhoff", "12345");
             request.Method = WebRequestMethods.Ftp.UploadFile;
             request.KeepAlive = false;
-            using (StreamReader source = new StreamReader($@"C:\Users\user\Desktop\ShoesV6\ShoesV6\bin\x64\Debug\MovePath\{DateTime.Now.ToString("yyyy-MM-dd")}\"+filename))
+            using (StreamReader source = new StreamReader($@"C:\Users\user\Desktop\ShoesV6\ShoesV6\bin\x64\Debug\MovePath\{DateTime.Now.ToString("yyyy-MM-dd")}\" + filename))
             {
-                fileContents = Encoding.UTF8.GetBytes( source.ReadToEnd());
+                fileContents = Encoding.UTF8.GetBytes(source.ReadToEnd());
             }
             request.ContentLength = fileContents.Length;
             using (Stream requestStream = request.GetRequestStream())
             {
                 requestStream.Write(fileContents, 0, fileContents.Length);
             }
-            using (FtpWebResponse response = (FtpWebResponse) request.GetResponse())
+            using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
             {
                 Console.WriteLine($"Upload File Complete, status {response.StatusDescription}");
             }
@@ -810,6 +914,7 @@ namespace ShoesV6
                 ini.IniWriteValue(comboBox_model.Text, null, null, "combobox.ini");
                 comboBox_model.Items.Remove(comboBox_model.Text);
                 comboBox_model.Text = "";
+                refresh_comboBox_ModelSize();
             }
             else if (comboBox_model.Text != "" && comboBox_size.Text != "" && comboBox_direction.Text != "")
             {
@@ -818,7 +923,7 @@ namespace ShoesV6
             }
             refreshDataGridView();
         }
- 
+
 
         private void btn_resample_Click(object sender, EventArgs e)
         {
@@ -832,7 +937,7 @@ namespace ShoesV6
                 ShareArea.shrink = int.Parse(text_shrink.Text);
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("請輸入數字");
                 return;
@@ -848,7 +953,7 @@ namespace ShoesV6
             Thread_sample.Join();
             btn_pathadj_Click(null, null);
         }
-       
+
         private void KUKA_EKI_ChangeEvent(bool state)
         {
             if (state)
@@ -903,7 +1008,7 @@ namespace ShoesV6
                 DiCtrl.SnapStop();
                 MessageBox.Show("IO斷線請重新連線");
             }
-        }        
+        }
         private void refreshDataGridView()
         {
             dataGridView.Rows.Clear();
@@ -941,8 +1046,8 @@ namespace ShoesV6
                 default:
                     break;
             }
-        }      
-      
+        }
+
         #endregion
 
 

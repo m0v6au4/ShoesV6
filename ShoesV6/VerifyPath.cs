@@ -31,12 +31,29 @@ namespace ShoesV6
             {
                 this.chart1.Series[0].Points.AddXY(Allinf[i][0], Allinf[i][1]);
             }
+            numericUpDown_index.Maximum = Allinf.Count() - 1;
             numericUpDown_index.Value = 0;
         }
         List<double[]> Allinf = new List<double[]>();
         List<double[]> AllinfLabel;
         int MaxX, MinX, incX, MaxY, MinY, incY, pointindex, pointindexLast, pointindexLastMove = 0;
         bool change = false, move = false;
+
+        private void button_RobotMove_Click(object sender, EventArgs e)
+        {
+            move = true;
+            string path = "<Robot><TeachMode>";
+            for (int i = pointindexLastMove; i >= pointindex; i--)
+            {
+                path = path + "<frame X=\"" + AllinfLabel[i][0] + "\" Y=\"" + AllinfLabel[i][1] + "\" Z=\"" + AllinfLabel[i][2] + "\" A=\"" + AllinfLabel[i][3] +
+            "\" B=\"" + AllinfLabel[i][4] + "\" C=\"" + AllinfLabel[i][5] + "\"></frame>";
+            }
+            path = path + "<xyzabcFrameCount>" + (pointindexLastMove - pointindex + 1) + "</xyzabcFrameCount>" + "<check>" + 1 + "</check>" + "<Tool>" + "3" + "</Tool>" + "<Base>" + "1" + "</Base>" + "</TeachMode>" + "</Robot>";
+            ShareArea.KUKA_EKI.Send(path);
+
+
+        }
+
         iniHelper ini = new iniHelper();
 
         private void chart1_MouseDown(object sender, MouseEventArgs e)
@@ -108,9 +125,11 @@ namespace ShoesV6
         private void LoadData()
         {
             DirectoryInfo directoryInfo = new DirectoryInfo(Application.StartupPath + $@"\MovePath\{DateTime.Now.ToString("yyyy-MM-dd")}");
-            var latestFile = directoryInfo.GetFiles("*.txt").OrderByDescending(n => n.CreationTime).Take(1).ToArray();           
-            string line;
+            var latestFile = directoryInfo.GetFiles("*.txt").OrderByDescending(n => n.CreationTime).Take(1).ToArray();
             string Path = latestFile[0].FullName;
+            //string Path = Application.StartupPath + @"\MovePath.txt";
+            string line;
+
             StreamReader sr = new StreamReader(Path);
             string[] Allsplit;
             double[] xyzabc;
@@ -127,7 +146,6 @@ namespace ShoesV6
             MinY = (int)Allinf.Min(p => p[1]) - 10;
             incY = (MinY - MaxY) / 10;
             AllinfLabel = Clone<double[]>(Allinf);
-            numericUpDown_index.Maximum = Allinf.Count() - 1;
         }
         private class ObjectUtil
         {

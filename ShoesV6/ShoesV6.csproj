@@ -214,6 +214,9 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ShareArea.cs" />
+    <Compile Include="testscan.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="txtLog.cs" />
     <Compile Include="VerifyPath.cs">
       <SubType>Form</SubType>

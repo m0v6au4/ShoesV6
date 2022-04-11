@@ -49,7 +49,7 @@ namespace ShoesV6
         List<double[]> AllinfLabel;
         ShareArea.shiftdata shiftdata = new ShareArea.shiftdata();
         int MaxX, MinX, incX, MaxY, MinY, incY, pointindex, pointindexLast, pointindexLastMove = 0;
-        bool change = false, move = false, _ekistate = false, save = false;
+        bool change = false, move = false, _ekistate = false, save = false, gunstate = false;
         string ModelSize = ShareArea.name;
         private void numericUpDown_index_ValueChanged(object sender, EventArgs e)
         {
@@ -106,6 +106,20 @@ namespace ShoesV6
             pointindexLast = pointindex;
             change = true;
             GC.Collect();
+        }
+
+        private void btn_gun_Click(object sender, EventArgs e)
+        {
+            if (!gunstate)
+            {
+                ShareArea.KUKA_EKI.Send("<Robot><Gun>1</Gun></Robot>");
+                gunstate = true;
+            }
+            else
+            {
+                ShareArea.KUKA_EKI.Send("<Robot><Gun>0</Gun></Robot>");
+                gunstate = false;
+            }
         }
 
         private void Formpathadj_FormClosing(object sender, FormClosingEventArgs e)

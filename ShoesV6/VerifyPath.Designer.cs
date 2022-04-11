@@ -87,6 +87,7 @@
             this.button_RobotMove.TabIndex = 62;
             this.button_RobotMove.Text = "RobotMove";
             this.button_RobotMove.UseVisualStyleBackColor = true;
+            this.button_RobotMove.Click += new System.EventHandler(this.button_RobotMove_Click);
             // 
             // numericUpDown_index
             // 
