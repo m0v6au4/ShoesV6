@@ -106,6 +106,8 @@ namespace ShoesV6
                 sw.Stop();
                 Console.WriteLine("取像與處理時間" + sw.ElapsedMilliseconds + "ms");
                 sw.Reset();
+                if(!sampleBool)
+                    btn_pathadj_Click(null, null);
             }
         }
         private void resample()

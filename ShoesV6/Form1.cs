@@ -368,8 +368,6 @@ namespace ShoesV6
                 Thread_sample.Start("sample");
                 btn_resample.Enabled = true;
             }
-            Thread_sample.Join();
-            btn_pathadj_Click(null, null);
         }
         private void checkKUKA()
         {
